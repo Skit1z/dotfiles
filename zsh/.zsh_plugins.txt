@@ -1,0 +1,35 @@
+# .zsh_plugins.txt - comments begin with "#"
+
+getantidote/use-omz
+ohmyzsh/ohmyzsh path:lib
+
+# omz plugins
+
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages
+ohmyzsh/ohmyzsh path:plugins/copybuffer
+ohmyzsh/ohmyzsh path:plugins/copyfile
+ohmyzsh/ohmyzsh path:plugins/copypath
+ohmyzsh/ohmyzsh path:plugins/extract
+ohmyzsh/ohmyzsh path:plugins/globalias
+ohmyzsh/ohmyzsh path:plugins/magic-enter
+ohmyzsh/ohmyzsh path:plugins/fancy-ctrl-z
+ohmyzsh/ohmyzsh path:plugins/otp
+ohmyzsh/ohmyzsh path:plugins/zoxide
+
+ohmyzsh/ohmyzsh path:plugins/git
+
+ohmyzsh/ohmyzsh path:plugins/brew 
+ohmyzsh/ohmyzsh path:plugins/macos 
+ohmyzsh/ohmyzsh path:plugins/ssh
+ohmyzsh/ohmyzsh path:plugins/pip
+ohmyzsh/ohmyzsh path:plugins/sudo
+ohmyzsh/ohmyzsh path:plugins/thefuck
+ohmyzsh/ohmyzsh path:plugins/tmux
+ohmyzsh/ohmyzsh path:plugins/uv
+ohmyzsh/ohmyzsh path:plugins/z
+
+
+zsh-users/zsh-completions path:src kind:fpath
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-history-substring-search
+zdharma-continuum/fast-syntax-highlighting
