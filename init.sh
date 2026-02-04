@@ -24,6 +24,7 @@ readonly ZSHRC_SOURCE="${DOTFILES_DIR}/.zshrc"
 readonly BASHRC_SOURCE="${DOTFILES_DIR}/bashrc"
 readonly VIMRC_SOURCE="${DOTFILES_DIR}/.vimrc"
 readonly GITCONFIG_SOURCE="${DOTFILES_DIR}/gitconfig"
+readonly TMUX_SOURCE="${DOTFILES_DIR}/tmux.conf"
 readonly ZSH_CONFIG_DIR="${DOTFILES_DIR}/zsh"
 readonly SHELL_CONFIG_DIR="${DOTFILES_DIR}/shell"
 
@@ -144,16 +145,10 @@ create_symlink() {
     local source="$1"
     local target="$2"
     
-    # 如果目标已经是正确的符号链接，跳过
-    if [[ -L "${target}" && "$(readlink "${target}")" == "${source}" ]]; then
-        log_info "符号链接已存在: ${target}"
-        return 0
-    fi
-    
-    # 备份已存在的文件/目录
+    # 备份已存在的文件/目录（非符号链接）
     backup_existing "${target}"
     
-    # 删除已存在的符号链接
+    # 删除已存在的符号链接（强制重建）
     [[ -L "${target}" ]] && rm "${target}"
     
     # 创建符号链接
@@ -244,6 +239,17 @@ setup_vim_config() {
         create_symlink "${VIMRC_SOURCE}" "${nvim_config_dir}/init.vim"
     else
         log_warn ".vimrc 文件不存在，跳过 vim 配置"
+    fi
+}
+
+setup_tmux_config() {
+    log_info "配置 tmux..."
+    
+    # 链接 ~/.tmux.conf
+    if [[ -f "${TMUX_SOURCE}" ]]; then
+        create_symlink "${TMUX_SOURCE}" "${HOME}/.tmux.conf"
+    else
+        log_warn "tmux.conf 文件不存在，跳过 tmux 配置"
     fi
 }
 
@@ -344,6 +350,9 @@ main() {
     
     # 配置 vim/nvim
     setup_vim_config
+    
+    # 配置 tmux
+    setup_tmux_config
     
     # 配置 git
     setup_git_config
