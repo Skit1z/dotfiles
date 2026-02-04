@@ -41,7 +41,10 @@ ZSH_COLORIZE_CHROMA_FORMATTER=terminal256
 
 [ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+# iTerm2 shell integration (仅在 iTerm2 中加载)
+if [[ "$TERM_PROGRAM" == "iTerm.app" ]]; then
+    test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+fi
 
 # zoxide 初始化
 eval "$(zoxide init zsh)"
