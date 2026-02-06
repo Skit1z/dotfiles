@@ -74,3 +74,9 @@ if command -v atuin &>/dev/null && command -v fzf &>/dev/null; then
     zle -N _fzf_atuin_history
     bindkey '^R' _fzf_atuin_history
 fi
+
+# 禁用 VS Code shell integration（会干扰 zsh 主题）
+if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+    PROMPT_COMMAND=""
+    unset __vsc_prompt_cmd_original
+fi

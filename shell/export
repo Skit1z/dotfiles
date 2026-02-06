@@ -8,3 +8,9 @@ export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
 export HOMEBREW_API_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles/api
 export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
+
+# 仅在 Skit1zdeMacBook-Air.local 上生效的配置
+if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
+    # 在这里添加特定于此机器的配置
+    export PATH="/opt/homebrew/Cellar/node/25.5.0/bin:$PATH"
+fi
