@@ -2,6 +2,7 @@
 
 getantidote/use-omz
 ohmyzsh/ohmyzsh path:lib
+ohmyzsh/ohmyzsh path:themes/robbyrussell.zsh-theme
 
 # omz plugins
 

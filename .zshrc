@@ -16,11 +16,24 @@ elif [[ -f /usr/local/opt/antidote/share/antidote/antidote.zsh ]]; then
     source /usr/local/opt/antidote/share/antidote/antidote.zsh
 fi
 
-# 设置 OMZ 目录（antidote 缓存路径）
-export ZSH="$(antidote home)/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
+# 初始化插件和主题（带兜底）
+export ZSH="${HOME}/Library/Caches/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
+if command -v antidote &>/dev/null; then
+    export ZSH="$(antidote home)/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
+    if ! antidote load; then
+        [ -f "$ZDOTDIR/.zsh_plugins.zsh" ] && source "$ZDOTDIR/.zsh_plugins.zsh"
+    fi
+elif [[ -f "$ZDOTDIR/.zsh_plugins.zsh" ]]; then
+    source "$ZDOTDIR/.zsh_plugins.zsh"
+fi
 
-# initialize plugins statically with ${ZDOTDIR:-~}/.zsh_plugins.txt
-antidote load
+# 主题兜底：插件链路异常时避免回落到默认 % 提示符
+if [[ -d "$ZSH" ]] && [[ -z "$PROMPT" || "$PROMPT" == '%m%# ' || "$PROMPT" == *"%n@%m %1~ %#"* ]]; then
+    [ -f "$ZSH/lib/git.zsh" ] && source "$ZSH/lib/git.zsh"
+    [ -f "$ZSH/lib/prompt_info_functions.zsh" ] && source "$ZSH/lib/prompt_info_functions.zsh"
+    [ -f "$ZSH/lib/theme-and-appearance.zsh" ] && source "$ZSH/lib/theme-and-appearance.zsh"
+    [ -f "$ZSH/themes/${ZSH_THEME}.zsh-theme" ] && source "$ZSH/themes/${ZSH_THEME}.zsh-theme"
+fi
 
 # 加载 shell 配置
 [ -f "$ZDOTDIR/shell/export" ] && source "$ZDOTDIR/shell/export"

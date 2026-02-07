@@ -13,4 +13,5 @@ export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bot
 if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
     # 在这里添加特定于此机器的配置
     export PATH="/opt/homebrew/Cellar/node/25.5.0/bin:$PATH"
+    [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
 fi
