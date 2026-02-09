@@ -15,3 +15,7 @@ if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
     export PATH="/opt/homebrew/Cellar/node/25.5.0/bin:$PATH"
     [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
 fi
+
+# 强制本地流量不走代理
+export no_proxy="localhost,127.0.0.1,0.0.0.0,192.168.0.0/16,10.0.0.0/8"
+export NO_PROXY="localhost,127.0.0.1,0.0.0.0,192.168.0.0/16,10.0.0.0/8"
