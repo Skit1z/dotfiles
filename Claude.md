@@ -121,9 +121,9 @@ JAVA_HOME='$(/usr/libexec/java_home -v 17'     # 缺少闭合括号，单引号�
 3. **测试** — 新开终端 / `source` / `tmux source-file` 验证
 4. **提交** — 使用有意义的 commit message：
    ```
-   feat: add proxy toggle functions
-   fix: correct JAVA_HOME syntax in export
-   refactor: move python alias to alias file
+   - feat: add proxy toggle functions
+   - fix: correct JAVA_HOME syntax in export
+   - refactor: move python alias to alias file
    ```
 
 ## 常见操作速查

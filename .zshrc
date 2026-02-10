@@ -93,3 +93,6 @@ if [[ "$TERM_PROGRAM" == "vscode" ]]; then
     PROMPT_COMMAND=""
     unset __vsc_prompt_cmd_original
 fi
+
+# opencode
+export PATH=/Users/skit1z/.opencode/bin:$PATH

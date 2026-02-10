@@ -251,6 +251,14 @@ setup_tmux_config() {
     else
         log_warn "tmux.conf 文件不存在，跳过 tmux 配置"
     fi
+
+    # 链接 ~/.tmux -> dotfiles/tmux（TPM 插件目录）
+    local tmux_dir="${DOTFILES_DIR}/tmux"
+    if [[ -d "${tmux_dir}" ]]; then
+        create_symlink "${tmux_dir}" "${HOME}/.tmux"
+        # 初始化子模块（确保 tpm 已拉取）
+        (cd "${DOTFILES_DIR}" && git submodule update --init --recursive) || log_warn "子模块初始化失败"
+    fi
 }
 
 setup_git_config() {

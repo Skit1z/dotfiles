@@ -1,5 +1,9 @@
 alias zsh-bench="~/Library/Caches/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-romkatv-SLASH-zsh-bench/zsh-bench"
 
+# Python 别名
+alias python="/usr/local/bin/python3"
+alias pip="/usr/local/bin/pip3"
+
 # Use colors in coreutils utilities output
 alias ls='eza --color=auto'
 alias grep='grep --color'
