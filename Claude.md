@@ -135,7 +135,7 @@ JAVA_HOME='$(/usr/libexec/java_home -v 17'     # 缺少闭合括号，单引号�
 | 重载 tmux 配置 | `C-a R`（prefix + Shift+r） |
 | 安装 tmux 插件 | `C-a I`（prefix + Shift+i） |
 | 更新 tmux 插件 | `C-a U`（prefix + Shift+u） |
-| 开启终端代理 | `proxy_on [port]`（默认 7890） |
+| 开启终端代理 | `proxy_on [port]`（默认 1082） |
 | 关闭终端代理 | `proxy_off` |
 | 查看代理状态 | `proxy_status` |
 

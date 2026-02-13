@@ -31,7 +31,7 @@ there() {
 
 # 代理开关（默认关闭，输入 proxy_on 开启，proxy_off 关闭）
 proxy_on() {
-    local port="${1:-7890}"
+    local port="${1:-1082}"
     export http_proxy="http://127.0.0.1:${port}"
     export https_proxy="http://127.0.0.1:${port}"
     export all_proxy="socks5://127.0.0.1:${port}"
