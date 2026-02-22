@@ -240,6 +240,41 @@ setup_vim_config() {
     else
         log_warn ".vimrc 文件不存在，跳过 vim 配置"
     fi
+
+    # Install vim-plug for Vim
+    # 为 Vim 安装 vim-plug
+    local vim_plug_path="${HOME}/.vim/autoload/plug.vim"
+    if [[ ! -f "${vim_plug_path}" ]]; then
+        log_info "安装 vim-plug (Vim)..."
+        curl -fLo "${vim_plug_path}" --create-dirs \
+            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim \
+            && log_success "vim-plug (Vim) 安装完成" \
+            || log_warn "vim-plug (Vim) 安装失败，首次启动 Vim 时会自动重试"
+    else
+        log_info "vim-plug (Vim) 已安装"
+    fi
+
+    # Install vim-plug for Neovim
+    # 为 Neovim 安装 vim-plug
+    local nvim_plug_path="${HOME}/.local/share/nvim/site/autoload/plug.vim"
+    if [[ ! -f "${nvim_plug_path}" ]]; then
+        log_info "安装 vim-plug (Neovim)..."
+        curl -fLo "${nvim_plug_path}" --create-dirs \
+            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim \
+            && log_success "vim-plug (Neovim) 安装完成" \
+            || log_warn "vim-plug (Neovim) 安装失败，首次启动 Neovim 时会自动重试"
+    else
+        log_info "vim-plug (Neovim) 已安装"
+    fi
+
+    # Install plugins
+    # 安装 Vim 插件
+    if command -v vim &>/dev/null && [[ -f "${vim_plug_path}" ]]; then
+        log_info "安装 Vim 插件..."
+        vim +PlugInstall +qall 2>/dev/null \
+            && log_success "Vim 插件安装完成" \
+            || log_warn "Vim 插件安装失败，可稍后在 Vim 中运行 :PlugInstall"
+    fi
 }
 
 setup_tmux_config() {

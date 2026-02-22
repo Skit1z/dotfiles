@@ -8,6 +8,7 @@
 dotfiles/
 ├── init.sh              # 安装脚本（macOS）- 创建软链接、安装依赖
 ├── .zshrc               # Zsh 主配置（antidote 插件管理、工具初始化）
+├── .vimrc               # Vim/Neovim 配置（vim-plug 插件管理）
 ├── bashrc               # Bash 主配置
 ├── bash_profile         # Bash 登录 shell 入口（仅 source bashrc）
 ├── tmux.conf            # Tmux 配置（prefix: C-a, 主题: tmux2k duo）
@@ -35,6 +36,7 @@ dotfiles/
 | 仓库文件 | 系统位置 |
 |----------|----------|
 | `.zshrc` | `~/.config/zsh/.zshrc` |
+| `.vimrc` | `~/.vimrc` 及 `~/.config/nvim/init.vim` |
 | `zsh/.zshenv` | `~/.zshenv` |
 | `zsh/.zsh_*` | `~/.config/zsh/.zsh_*` |
 | `shell/` | `~/.config/zsh/shell/` |

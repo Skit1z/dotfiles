@@ -1,5 +1,6 @@
 " =============================================================================
-"  Vim (no plugins) - readable, beautiful, easy (2-space) for iTerm2 & VSCode
+"  Vim/Neovim 配置 - 支持 vim-plug 插件管理
+"  Works in: Terminal.app / iTerm2 / VSCode / Ghostty
 " =============================================================================
 
 " --- 基础 ---
@@ -15,6 +16,55 @@ set history=2000
 syntax on
 filetype plugin indent on
 
+" =============================================================================
+" vim-plug 插件管理
+" =============================================================================
+" Auto-install vim-plug if not found
+" 自动安装 vim-plug（如果不存在）
+let s:data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(s:data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo ' . s:data_dir . '/autoload/plug.vim --create-dirs '
+    \ . 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin()
+
+" Color scheme - works well in 256-color terminals
+" 配色方案 - 在 256 色终端下也有良好表现
+Plug 'joshdick/onedark.vim'
+Plug 'morhetz/gruvbox'
+
+" Status line - lightweight and informative
+" 状态栏 - 轻量且信息丰富
+Plug 'itchyny/lightline.vim'
+
+" File explorer - better than netrw
+" 文件浏览器 - 比 netrw 更好用
+Plug 'preservim/nerdtree', { 'on': 'NERDTreeToggle' }
+
+" Syntax highlighting enhancement
+" 语法高亮增强
+Plug 'sheerun/vim-polyglot'
+
+" Git integration
+" Git 集成
+Plug 'airblade/vim-gitgutter'
+
+" Auto pairs - brackets, quotes, etc.
+" 自动配对 - 括号、引号等
+Plug 'jiangmiao/auto-pairs'
+
+" Comment toggle
+" 注释切换
+Plug 'tpope/vim-commentary'
+
+" Surround - change surrounding chars
+" 包围操作 - 修改包围字符
+Plug 'tpope/vim-surround'
+
+call plug#end()
+
 " --- 外观/信息 ---
 set number
 set relativenumber
@@ -22,19 +72,57 @@ set cursorline
 set ruler
 set laststatus=2
 set showcmd
-set showmode
+set noshowmode        " lightline already shows mode
 set signcolumn=yes
 set scrolloff=4
 set sidescrolloff=6
 set cmdheight=1
 
-" 真彩：iTerm2 & VSCode 终端一般都支持
+" Terminal color detection
+" 终端颜色检测：仅在支持的终端中启用真彩色
 if has('termguicolors')
-  set termguicolors
+  " Terminal.app does NOT support truecolor; iTerm2 / Ghostty / VSCode do
+  " macOS Terminal.app 不支持真彩色；iTerm2 / Ghostty / VSCode 支持
+  if $TERM_PROGRAM ==# 'Apple_Terminal'
+    set notermguicolors
+  else
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+    set termguicolors
+  endif
+endif
+
+" Ensure 256 colors in all terminals
+" 确保所有终端至少使用 256 色
+if &term =~# '256color' || $TERM_PROGRAM ==# 'Apple_Terminal'
+  set t_Co=256
 endif
 
 set background=dark
-silent! colorscheme desert
+
+" Color scheme with fallback
+" 配色方案（带回退）
+try
+  let g:gruvbox_contrast_dark = 'medium'
+  let g:gruvbox_italic = 1
+  colorscheme gruvbox
+catch
+  try
+    colorscheme onedark
+  catch
+    colorscheme desert
+  endtry
+endtry
+
+" Lightline configuration
+" Lightline 状态栏配置
+let g:lightline = {
+  \ 'colorscheme': 'gruvbox',
+  \ 'active': {
+  \   'left':  [['mode', 'paste'], ['readonly', 'filename', 'modified']],
+  \   'right': [['lineinfo'], ['percent'], ['filetype', 'fileencoding', 'fileformat']]
+  \ },
+  \ }
 
 " 搜索显示
 set hlsearch
@@ -124,24 +212,43 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
 " =============================================================================
-" netrw (内置文件浏览器)：尽量接近“现代文件树”体验
+" netrw (内置文件浏览器)：作为 NERDTree 的后备
 " =============================================================================
 let g:netrw_banner=0
 let g:netrw_liststyle=3      " tree
 let g:netrw_browse_split=4   " open in prior window
 let g:netrw_altv=1
 let g:netrw_winsize=25
-nnoremap <leader>e :Lexplore<CR>
+
+" Use NERDTree if available, otherwise netrw
+" 优先使用 NERDTree，否则使用 netrw
+if exists(':NERDTreeToggle')
+  nnoremap <leader>e :NERDTreeToggle<CR>
+else
+  nnoremap <leader>e :Lexplore<CR>
+endif
+
+" NERDTree settings
+" NERDTree 配置
+let g:NERDTreeShowHidden = 1
+let g:NERDTreeMinimalUI = 1
+let g:NERDTreeWinSize = 30
+" Close vim if NERDTree is the only window remaining
+" 如果 NERDTree 是最后一个窗口则关闭 vim
+autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
 
 " =============================================================================
-" Statusline (纯内置：够用且清晰)
+" Statusline fallback (used only if lightline is not loaded)
+" 状态栏回退（仅在 lightline 未加载时使用）
 " =============================================================================
-set statusline=
-set statusline+=\ %f
-set statusline+=%m%r%h%w
-set statusline+=%=
-set statusline+=%{&filetype}\ \|\ %{&fileencoding}\ \|\ %{&fileformat}
-set statusline+=\ \|\ %l:%c\ (%p%%)
+if !exists('g:loaded_lightline')
+  set statusline=
+  set statusline+=\ %f
+  set statusline+=%m%r%h%w
+  set statusline+=%=
+  set statusline+=%{&filetype}\ \|\ %{&fileencoding}\ \|\ %{&fileformat}
+  set statusline+=\ \|\ %l:%c\ (%p%%)
+endif
 
 " =============================================================================
 " End

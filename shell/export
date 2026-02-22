@@ -19,6 +19,19 @@ if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
     [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
 fi
 
+# 仅在 Skit1zdeMacBook-Pro.local 上生效的配置
+if [[ "$(hostname)" == "Skit1zdeMacBook-Pro.local" ]]; then
+    # 在这里添加特定于此 MacBook Pro 的配置
+    export ANDROID_HOME=$HOME/Library/Android/sdk
+    export PATH=$PATH:$ANDROID_HOME/emulator
+    export PATH=$PATH:$ANDROID_HOME/platform-tools
+
+    # Homebrew Ruby
+    export PATH="/usr/local/opt/ruby/bin:$PATH"
+    export LDFLAGS="-L/usr/local/opt/ruby/lib"
+    export CPPFLAGS="-I/usr/local/opt/ruby/include"
+fi
+
 # 强制本地流量不走代理
 export no_proxy="localhost,127.0.0.1,0.0.0.0,192.168.0.0/16,10.0.0.0/8"
 export NO_PROXY="localhost,127.0.0.1,0.0.0.0,192.168.0.0/16,10.0.0.0/8"
