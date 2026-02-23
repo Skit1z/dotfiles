@@ -63,6 +63,16 @@ Plug 'tpope/vim-commentary'
 " 包围操作 - 修改包围字符
 Plug 'tpope/vim-surround'
 
+" LSP client - language server protocol support
+" LSP 客户端 - 语言服务器协议支持
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
+
+" Async auto-completion - works with vim-lsp
+" 异步自动补全 - 配合 vim-lsp 使用
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+
 call plug#end()
 
 " --- 外观/信息 ---
@@ -236,6 +246,110 @@ let g:NERDTreeWinSize = 30
 " Close vim if NERDTree is the only window remaining
 " 如果 NERDTree 是最后一个窗口则关闭 vim
 autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+
+" =============================================================================
+" LSP Configuration (vim-lsp)
+" LSP 配置
+" =============================================================================
+
+" LSP diagnostics signs
+" LSP 诊断标记
+let g:lsp_diagnostics_enabled = 1
+let g:lsp_diagnostics_echo_cursor = 1
+let g:lsp_diagnostics_float_cursor = 1
+let g:lsp_diagnostics_signs_enabled = 1
+let g:lsp_diagnostics_signs_error = {'text': '✗'}
+let g:lsp_diagnostics_signs_warning = {'text': '▲'}
+let g:lsp_diagnostics_signs_hint = {'text': '▸'}
+let g:lsp_diagnostics_signs_information = {'text': 'ℹ'}
+
+" Reduce diagnostic delay
+" 减少诊断延迟
+let g:lsp_diagnostics_echo_delay = 200
+
+" Enable code actions sign
+" 启用代码操作标记
+let g:lsp_document_code_action_signs_enabled = 0
+
+" Register clangd as LSP server for C/C++
+" 注册 clangd 作为 C/C++ 的 LSP 服务器
+if executable('clangd')
+  augroup lsp_clangd
+    autocmd!
+    autocmd User lsp_setup call lsp#register_server({
+      \ 'name': 'clangd',
+      \ 'cmd': {server_info->['clangd', '--background-index', '--clang-tidy']},
+      \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+      \ })
+  augroup END
+endif
+
+" LSP keymaps - only active in buffers with LSP attached
+" LSP 快捷键 - 仅在有 LSP 的缓冲区中生效
+function! s:on_lsp_buffer_enabled() abort
+  setlocal omnifunc=lsp#complete
+  setlocal signcolumn=yes
+
+  " Go to definition
+  " 跳转到定义
+  nmap <buffer> gd <plug>(lsp-definition)
+
+  " Go to declaration
+  " 跳转到声明
+  nmap <buffer> gD <plug>(lsp-declaration)
+
+  " Go to implementation
+  " 跳转到实现
+  nmap <buffer> gi <plug>(lsp-implementation)
+
+  " Go to type definition
+  " 跳转到类型定义
+  nmap <buffer> gt <plug>(lsp-type-definition)
+
+  " Find references
+  " 查找引用
+  nmap <buffer> gr <plug>(lsp-references)
+
+  " Hover documentation
+  " 悬浮文档
+  nmap <buffer> K <plug>(lsp-hover)
+
+  " Rename symbol
+  " 重命名符号
+  nmap <buffer> <leader>rn <plug>(lsp-rename)
+
+  " Code action
+  " 代码操作
+  nmap <buffer> <leader>ca <plug>(lsp-code-action)
+
+  " Format document
+  " 格式化文档
+  nmap <buffer> <leader>f <plug>(lsp-document-format)
+
+  " Diagnostics navigation
+  " 诊断导航
+  nmap <buffer> [d <plug>(lsp-previous-diagnostic)
+  nmap <buffer> ]d <plug>(lsp-next-diagnostic)
+
+  " Show document diagnostics
+  " 显示文档诊断
+  nmap <buffer> <leader>dd <plug>(lsp-document-diagnostics)
+endfunction
+
+augroup lsp_install
+  autocmd!
+  autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
+" Asyncomplete settings
+" 异步补全设置
+let g:asyncomplete_auto_popup = 1
+let g:asyncomplete_auto_completeopt = 0
+set completeopt=menuone,noinsert,noselect,preview
+
+" Auto-close preview window after completion
+" 补全后自动关闭预览窗口
+autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
 " =============================================================================
 " Statusline fallback (used only if lightline is not loaded)
