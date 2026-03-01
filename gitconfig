@@ -94,7 +94,8 @@
 	default = upstream
 
 [credential]
-	helper = osxkeychain
+	# OS-specific helper set via ~/.gitconfig_local
+	# macOS: osxkeychain, Linux: cache/store
 
 [grep]
 	lineNumber = true
@@ -113,6 +114,11 @@
 
 [core]
 	excludesfile = ~/.gitignore_global
+
+[include]
+	# OS-specific and machine-specific overrides
+	# 操作系统和机器特定的覆盖配置
+	path = ~/.gitconfig_local
 
 [url "https://github.com/"]
 	insteadOf = git://github.com/

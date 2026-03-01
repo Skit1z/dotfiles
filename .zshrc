@@ -9,14 +9,22 @@ else
     compinit -C
 fi
 
-# source antidote (uses HOMEBREW_PREFIX set by brew shellenv in .zshenv)
-# 加载 antidote（使用 .zshenv 中 brew shellenv 设置的 HOMEBREW_PREFIX）
+# source antidote (Homebrew / Linuxbrew / git clone)
+# 加载 antidote（Homebrew / Linuxbrew / git clone）
 if [[ -f "${HOMEBREW_PREFIX}/opt/antidote/share/antidote/antidote.zsh" ]]; then
     source "${HOMEBREW_PREFIX}/opt/antidote/share/antidote/antidote.zsh"
+elif [[ -f "${HOME}/.antidote/antidote.zsh" ]]; then
+    source "${HOME}/.antidote/antidote.zsh"
 fi
 
 # 初始化插件和主题（带兜底）
-export ZSH="${HOME}/Library/Caches/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
+# antidote cache path differs by OS
+# antidote 缓存路径按操作系统区分
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    export ZSH="${HOME}/Library/Caches/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
+else
+    export ZSH="${HOME}/.cache/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
+fi
 if command -v antidote &>/dev/null; then
     export ZSH="$(antidote home)/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
     if ! antidote load; then
@@ -62,10 +70,15 @@ eval "$(zoxide init zsh)"
 export ATUIN_NOBIND=true
 command -v atuin &>/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
 
-# fzf 配置
+# fzf 配置 (Homebrew / apt / git clone)
 if [[ -f "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh" ]]; then
     source "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh"
     source "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh"
+elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+    [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
+elif [[ -f "${HOME}/.fzf.zsh" ]]; then
+    source "${HOME}/.fzf.zsh"
 fi
 
 # 使用 fzf + atuin 搜索历史 (Ctrl+R)

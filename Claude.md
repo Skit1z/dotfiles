@@ -6,7 +6,7 @@
 
 ```
 dotfiles/
-├── init.sh              # 安装脚本（macOS）- 创建软链接、安装依赖
+├── init.sh              # 安装脚本（macOS / Debian）- 创建软链接、安装依赖
 ├── .zshrc               # Zsh 主配置（antidote 插件管理、工具初始化）
 ├── .vimrc               # Vim/Neovim 配置（vim-plug 插件管理）
 ├── bashrc               # Bash 主配置
@@ -15,9 +15,8 @@ dotfiles/
 ├── gitconfig            # Git 全局配置
 ├── README.md            # 项目说明
 ├── zsh/                 # Zsh 特定配置
-│   ├── .zshenv          # ZDOTDIR 设置、Homebrew PATH
+│   ├── .zshenv          # ZDOTDIR 设置、Homebrew/Linuxbrew PATH
 │   ├── .zsh_plugins.txt # Antidote 插件清单
-│   └── .zsh_zoxide      # Zoxide 初始化脚本
 ├── shell/               # Bash/Zsh 共享配置
 │   ├── export           # 环境变量
 │   ├── alias            # 命令别名
@@ -102,10 +101,11 @@ JAVA_HOME='$(/usr/libexec/java_home -v 17'     # 缺少闭合括号，单引号�
 - 配置区块之间用空行分隔
 - 被注释掉的示例配置用 `# set -g ...` 格式，保留一行即可
 
-## 多机差异处理
+## 多机 / 多系统差异处理
 
 ### 原则
 - 通用配置放在共享文件中
+- 操作系统差异优先用 `uname -s` 条件判断（`Darwin` / `Linux`）
 - 机器特定配置通过 `hostname` 条件判断：
   ```bash
   if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
@@ -115,6 +115,7 @@ JAVA_HOME='$(/usr/libexec/java_home -v 17'     # 缺少闭合括号，单引号�
 - 或通过"本地覆盖"文件（不纳入 git）：
   - `~/.tmux_local.conf`
   - `~/.bashrc_local`
+  - `~/.gitconfig_local`
 
 ## 新增配置的工作流
 
@@ -146,7 +147,6 @@ JAVA_HOME='$(/usr/libexec/java_home -v 17'     # 缺少闭合括号，单引号�
 1. **`escape-time` 设为 10ms** — 为了支持 iTerm2 的 Option+方向键切换面板。设为 0 会导致转义序列被截断。
 2. **iTerm2 必须将 Option 键设为 `Esc+`** — Settings → Profiles → Keys → General → Left/Right Option key = Esc+
 3. **`bash/plugins.bash`** 中引用了 `~/.shell/plugins/dircolors-solarized/` 目录，但该目录可能不存在。
-4. **`bash/settings.bash`** 硬编码了 `/opt/homebrew/bin/brew`，应使用与 `.zshenv`/`bashrc` 一致的条件判断。
-5. **`tmux.conf` 中 `bind @` 命令** 使用了 `"pane -s ':%%'"`，`pane` 不是 tmux 命令，应为 `join-pane`。
-6. **TPM 路径** `run 'tmux/plugins/tpm/tpm'` 是相对路径，如果 tmux 的工作目录不在 dotfiles 根目录则会失败。可改为绝对路径 `run '~/Workspace/dotfiles/tmux/plugins/tpm/tpm'` 或创建 `~/.tmux -> ~/Workspace/dotfiles/tmux` 软链接后使用 `run '~/.tmux/plugins/tpm/tpm'`。
-6. **更改任何文件的时候，总是考虑多机同步这个前提**
+4. **Debian 环境下工具可用性**：`eza`、`atuin`、`thefuck` 可能不在默认 apt 源，脚本已提供 fallback/提示；若安装失败可手动安装。
+5. **TPM 路径** 当前使用 `run '~/.tmux/plugins/tpm/tpm'`，依赖 `init.sh` 创建 `~/.tmux -> ~/Workspace/dotfiles/tmux` 软链接。
+6. **更改任何文件的时候，总是考虑多机同步和多系统（macOS + Debian）同步这个前提**

@@ -1,11 +1,25 @@
 # Use colors in coreutils utilities output
-alias ls='eza --color=auto'
+# 使用彩色输出
 alias grep='grep --color'
 
-# ls aliases
-alias ll='eza -lah --color=auto'
-alias la='eza -A --color=auto'
-alias l='eza --color=auto'
+# ls aliases (prefer eza, fallback to ls)
+# ls 别名（优先使用 eza，回退到 ls）
+if command -v eza &>/dev/null; then
+    alias ls='eza --color=auto'
+    alias ll='eza -lah --color=auto'
+    alias la='eza -A --color=auto'
+    alias l='eza --color=auto'
+elif [[ "$(uname -s)" == "Darwin" ]]; then
+    alias ls='ls -G'
+    alias ll='ls -lahG'
+    alias la='ls -AG'
+    alias l='ls -G'
+else
+    alias ls='ls --color=auto'
+    alias ll='ls -lah --color=auto'
+    alias la='ls -A --color=auto'
+    alias l='ls --color=auto'
+fi
 
 # Aliases to protect against overwriting
 alias cp='cp -i'
