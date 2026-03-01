@@ -57,7 +57,7 @@
 	zip = ! "zip() { git archive --format zip --prefix=\"${PWD##*/}/\" HEAD -o ${1}; }; zip"
 
 [init]
-	defaultBranch = master
+	defaultBranch = main
 
 [diff]
 	mnemonicPrefix = true
@@ -94,7 +94,7 @@
 	default = upstream
 
 [credential]
-	helper = cache --timeout=3600
+	helper = osxkeychain
 
 [grep]
 	lineNumber = true
@@ -116,5 +116,3 @@
 
 [url "https://github.com/"]
 	insteadOf = git://github.com/
-[safe]
-	directory = *

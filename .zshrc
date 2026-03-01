@@ -9,11 +9,10 @@ else
     compinit -C
 fi
 
-# source antidote
-if [[ -f /opt/homebrew/opt/antidote/share/antidote/antidote.zsh ]]; then
-    source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
-elif [[ -f /usr/local/opt/antidote/share/antidote/antidote.zsh ]]; then
-    source /usr/local/opt/antidote/share/antidote/antidote.zsh
+# source antidote (uses HOMEBREW_PREFIX set by brew shellenv in .zshenv)
+# 加载 antidote（使用 .zshenv 中 brew shellenv 设置的 HOMEBREW_PREFIX）
+if [[ -f "${HOMEBREW_PREFIX}/opt/antidote/share/antidote/antidote.zsh" ]]; then
+    source "${HOMEBREW_PREFIX}/opt/antidote/share/antidote/antidote.zsh"
 fi
 
 # 初始化插件和主题（带兜底）
@@ -40,19 +39,16 @@ fi
 [ -f "$ZDOTDIR/shell/alias" ] && source "$ZDOTDIR/shell/alias"
 [ -f "$ZDOTDIR/shell/functions.sh" ] && source "$ZDOTDIR/shell/functions.sh"
 [ -f "$ZDOTDIR/shell/welcome.sh" ] && source "$ZDOTDIR/shell/welcome.sh"
-[ -f "$ZDOTDIR/.zsh_zoxide" ] && source "$ZDOTDIR/.zsh_zoxide"
 
+# thefuck - lazy load (only initialize on first use)
 # thefuck - 延迟加载（只在首次使用时初始化）
-fuck() {
-    unfunction fuck
-    eval "$(thefuck --alias)"
-    fuck "$@"
-}
-
-ZSH_COLORIZE_STYLE="colorful"
-ZSH_COLORIZE_CHROMA_FORMATTER=terminal256
-
-[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
+if command -v thefuck &>/dev/null; then
+    fuck() {
+        unfunction fuck
+        eval "$(thefuck --alias)"
+        fuck "$@"
+    }
+fi
 
 # iTerm2 shell integration (仅在 iTerm2 中加载)
 if [[ "$TERM_PROGRAM" == "iTerm.app" ]]; then
@@ -67,9 +63,9 @@ export ATUIN_NOBIND=true
 command -v atuin &>/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
 
 # fzf 配置
-if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
-    source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
-    source /opt/homebrew/opt/fzf/shell/completion.zsh
+if [[ -f "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh" ]]; then
+    source "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh"
+    source "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh"
 fi
 
 # 使用 fzf + atuin 搜索历史 (Ctrl+R)
@@ -95,4 +91,6 @@ if [[ "$TERM_PROGRAM" == "vscode" ]]; then
 fi
 
 # opencode
-export PATH=/Users/skit1z/.opencode/bin:$PATH
+if [[ -d "$HOME/.opencode/bin" ]]; then
+    export PATH="$HOME/.opencode/bin:$PATH"
+fi

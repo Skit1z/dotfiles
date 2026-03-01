@@ -53,8 +53,18 @@ fi
 export ATUIN_NOBIND=true
 command -v atuin &>/dev/null && eval "$(atuin init bash --disable-up-arrow)"
 
-# thefuck
-command -v thefuck &>/dev/null && eval "$(thefuck --alias)"
+# thefuck - lazy load (only initialize on first use)
+# thefuck - 延迟加载（只在首次使用时初始化）
+if command -v thefuck &>/dev/null; then
+    _thefuck_loaded=0
+    fuck() {
+        if [[ $_thefuck_loaded -eq 0 ]]; then
+            eval "$(thefuck --alias)"
+            _thefuck_loaded=1
+        fi
+        fuck "$@"
+    }
+fi
 
 # ================================
 # 允许本地自定义

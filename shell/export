@@ -21,7 +21,11 @@ fi
 # 仅在 Skit1zdeMacBook-Air.local 上生效的配置
 if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
     # 在这里添加特定于此机器的配置
-    export PATH="/opt/homebrew/Cellar/node/25.5.0/bin:$PATH"
+    # Homebrew Node.js (version-independent path)
+    # Homebrew Node.js（不含版本号的路径）
+    if [[ -d "${HOMEBREW_PREFIX}/opt/node/bin" ]]; then
+        export PATH="${HOMEBREW_PREFIX}/opt/node/bin:$PATH"
+    fi
     [ -f "$HOME/.openclaw/completions/openclaw.zsh" ] && source "$HOME/.openclaw/completions/openclaw.zsh"
 fi
 
@@ -33,9 +37,9 @@ if [[ "$(hostname)" == "Skit1zdeMacBook-Pro.local" ]]; then
     export PATH=$PATH:$ANDROID_HOME/platform-tools
 
     # Homebrew Ruby
-    export PATH="/usr/local/opt/ruby/bin:$PATH"
-    export LDFLAGS="-L/usr/local/opt/ruby/lib"
-    export CPPFLAGS="-I/usr/local/opt/ruby/include"
+    export PATH="${HOMEBREW_PREFIX}/opt/ruby/bin:$PATH"
+    export LDFLAGS="-L${HOMEBREW_PREFIX}/opt/ruby/lib"
+    export CPPFLAGS="-I${HOMEBREW_PREFIX}/opt/ruby/include"
 fi
 
 # 强制本地流量不走代理
