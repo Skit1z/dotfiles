@@ -12,6 +12,12 @@ export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bot
 export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
 export HOMEBREW_NO_AUTO_UPDATE=1
 
+# Homebrew Python 3 (Intel & Apple Silicon compatible)
+# 使用 Homebrew 安装的 Python 3 作为默认版本
+if [[ -d "${HOMEBREW_PREFIX}/opt/python3/libexec/bin" ]]; then
+    export PATH="${HOMEBREW_PREFIX}/opt/python3/libexec/bin:$PATH"
+fi
+
 # 仅在 Skit1zdeMacBook-Air.local 上生效的配置
 if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
     # 在这里添加特定于此机器的配置

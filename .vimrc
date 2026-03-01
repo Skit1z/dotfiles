@@ -73,6 +73,10 @@ Plug 'mattn/vim-lsp-settings'
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
+" Floating terminal - works in both Vim and Neovim
+" 浮窗终端 - 支持 Vim 和 Neovim
+Plug 'voldikss/vim-floaterm'
+
 call plug#end()
 
 " --- 外观/信息 ---
@@ -350,6 +354,38 @@ set completeopt=menuone,noinsert,noselect,preview
 " Auto-close preview window after completion
 " 补全后自动关闭预览窗口
 autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+
+" =============================================================================
+" Terminal Configuration (vim-floaterm)
+" 终端配置
+" =============================================================================
+
+" Floaterm settings
+" 浮窗终端设置
+let g:floaterm_position = 'bottomright'
+let g:floaterm_width = 0.9
+let g:floaterm_height = 0.4
+let g:floaterm_borderchars = '─│─│╭╮╰╯'
+let g:floaterm_title = 'Terminal'
+let g:floaterm_titleposition = 'left'
+
+" Toggle floating terminal
+" 切换浮窗终端
+nnoremap <leader>t :FloatermToggle<CR>
+tnoremap <leader>t <C-\><C-n>:FloatermToggle<CR>
+
+" Create new floating terminal
+" 创建新终端
+nnoremap <leader>T :FloatermNew<CR>
+
+" Kill floating terminal
+" 关闭浮窗终端
+nnoremap <leader>tk :FloatermKill<CR>
+
+" Switch to next/prev floating terminal
+" 切换到下一个/上一个终端
+nnoremap <leader>tn :FloatermNext<CR>
+nnoremap <leader>tp :FloatermPrev<CR>
 
 " =============================================================================
 " Statusline fallback (used only if lightline is not loaded)
