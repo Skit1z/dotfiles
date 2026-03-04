@@ -24,6 +24,20 @@ if [[ -d "${HOMEBREW_PREFIX}/opt/python3/libexec/bin" ]]; then
     export PATH="${HOMEBREW_PREFIX}/opt/python3/libexec/bin:$PATH"
 fi
 
+# Homebrew GCC (macOS only, override Apple Clang)
+# 使用 Homebrew 安装的 GCC 替代 Apple Clang
+if [[ "$(uname -s)" == "Darwin" && -d "${HOMEBREW_PREFIX}/opt/gcc/bin" ]]; then
+    export PATH="${HOMEBREW_PREFIX}/opt/gcc/bin:$PATH"
+    # 自动检测 gcc 主版本号
+    _brew_gcc="$(ls "${HOMEBREW_PREFIX}/opt/gcc/bin"/gcc-[0-9]* 2>/dev/null | sort -V | tail -1)"
+    if [[ -n "${_brew_gcc}" ]]; then
+        _brew_gcc_ver="${_brew_gcc##*gcc-}"
+        export CC="gcc-${_brew_gcc_ver}"
+        export CXX="g++-${_brew_gcc_ver}"
+    fi
+    unset _brew_gcc _brew_gcc_ver
+fi
+
 # 仅在 Skit1zdeMacBook-Air.local 上生效的配置
 if [[ "$(hostname)" == "Skit1zdeMacBook-Air.local" ]]; then
     # 在这里添加特定于此机器的配置
