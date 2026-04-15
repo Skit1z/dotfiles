@@ -12,3 +12,7 @@ fi
 
 # 设置 ZDOTDIR
 export ZDOTDIR="$HOME/.config/zsh"
+
+# Rust/Cargo 环境（仅在文件存在时加载）
+# Rust/Cargo environment (only load when present)
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"

@@ -65,7 +65,7 @@
 	compactionHeuristic = true
 
 [color]
-	ui = auto
+	ui = true
 
 [color "grep"]
 	match = cyan bold

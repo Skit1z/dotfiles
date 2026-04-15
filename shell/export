@@ -5,7 +5,11 @@ export PATH="$PATH:$HOME/.local/bin"
 # Java 环境 (macOS / Debian)
 if [[ -x /usr/libexec/java_home ]]; then
     # macOS
-    export JAVA_HOME="$(/usr/libexec/java_home -v 17 2>/dev/null)"
+    _default_java_home="$(/usr/libexec/java_home -v 17 2>/dev/null)"
+    if [[ -n "${_default_java_home}" ]]; then
+        export JAVA_HOME="${_default_java_home}"
+    fi
+    unset _default_java_home
 elif [[ -d /usr/lib/jvm/default-java ]]; then
     # Debian/Ubuntu (managed by update-alternatives)
     export JAVA_HOME="/usr/lib/jvm/default-java"
@@ -60,8 +64,15 @@ if [[ "$(hostname)" == "Skit1zdeMacBook-Pro.local" ]]; then
     export PATH="${HOMEBREW_PREFIX}/opt/ruby/bin:$PATH"
     export LDFLAGS="-L${HOMEBREW_PREFIX}/opt/ruby/lib"
     export CPPFLAGS="-I${HOMEBREW_PREFIX}/opt/ruby/include"
+
+
+    export NEMU_HOME=/Users/skit1z/Workspace/Ysyx/E-stage/ysyx-workbench/nemu
+    export AM_HOME=/Users/skit1z/Workspace/Ysyx/E-stage/ysyx-workbench/abstract-machine
 fi
 
 # 强制本地流量不走代理
 export no_proxy="localhost,127.0.0.1,0.0.0.0,192.168.0.0/16,10.0.0.0/8"
 export NO_PROXY="localhost,127.0.0.1,0.0.0.0,192.168.0.0/16,10.0.0.0/8"
+
+export ENABLE_TOOL_SEARCH=0
+export CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1

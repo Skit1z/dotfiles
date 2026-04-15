@@ -1,5 +1,11 @@
 # Bash 配置文件 - 由 dotfiles 管理
 
+# 仅在 Bash 中执行，避免在 zsh/source ~/.bashrc 时触发兼容性错误
+# Run only in Bash to avoid compatibility errors when sourced from zsh
+if [[ -z "${BASH_VERSION:-}" ]]; then
+    return 0 2>/dev/null || exit 0
+fi
+
 # ================================
 # Homebrew/Linuxbrew PATH 初始化
 # ================================
@@ -72,3 +78,9 @@ fi
 # 允许本地自定义
 # ================================
 [ -f ~/.bashrc_local ] && source ~/.bashrc_local
+
+# Rust/Cargo 环境（仅在文件存在时加载）
+# Rust/Cargo environment (only load when present)
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+
+export AM_HOME=/Users/skit1z/Workspace/Ysyx/E-stage/ysyx-workbench/abstract-machine

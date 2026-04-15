@@ -143,3 +143,49 @@ fpr() {
         git fetch "git@github.com:${user}/${repo}" "${branch}:${user}/${branch}"
     )
 }
+
+# Java helpers (macOS)
+# Java 版本管理辅助函数（macOS）
+jdk() {
+    if [[ "$(uname -s)" != "Darwin" ]]; then
+        echo "jdk: this function currently supports macOS only"
+        return 1
+    fi
+
+    case "${1:-}" in
+        ""|"current")
+            echo "JAVA_HOME=${JAVA_HOME:-<unset>}"
+            java -version 2>&1 | head -n 1
+            ;;
+        "list")
+            /usr/libexec/java_home -V 2>&1
+            ;;
+        "use")
+            if [[ -z "${2:-}" ]]; then
+                echo "Usage: jdk use <version>"
+                echo "Example: jdk use 17 | jdk use 1.8"
+                return 1
+            fi
+
+            local target_home
+            target_home="$(/usr/libexec/java_home -v "${2}" 2>/dev/null)"
+            if [[ -z "${target_home}" ]]; then
+                echo "❌ JDK version not found: ${2}"
+                echo "Run 'jdk list' to see installed versions."
+                return 1
+            fi
+
+            export JAVA_HOME="${target_home}"
+            export PATH="${JAVA_HOME}/bin:${PATH}"
+            hash -r 2>/dev/null || true
+
+            echo "✅ Switched to JDK ${2}"
+            echo "JAVA_HOME=${JAVA_HOME}"
+            java -version 2>&1 | head -n 1
+            ;;
+        *)
+            echo "Usage: jdk [current|list|use <version>]"
+            return 1
+            ;;
+    esac
+}
