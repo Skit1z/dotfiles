@@ -43,9 +43,9 @@ if [[ -d "$ZSH" ]] && [[ -z "$PROMPT" || "$PROMPT" == '%m%# ' || "$PROMPT" == *"
 fi
 
 # 加载 shell 配置
+[ -f "$ZDOTDIR/shell/functions.sh" ] && source "$ZDOTDIR/shell/functions.sh"
 [ -f "$ZDOTDIR/shell/export" ] && source "$ZDOTDIR/shell/export"
 [ -f "$ZDOTDIR/shell/alias" ] && source "$ZDOTDIR/shell/alias"
-[ -f "$ZDOTDIR/shell/functions.sh" ] && source "$ZDOTDIR/shell/functions.sh"
 [ -f "$ZDOTDIR/shell/welcome.sh" ] && source "$ZDOTDIR/shell/welcome.sh"
 
 # thefuck - lazy load (only initialize on first use)
@@ -101,11 +101,6 @@ fi
 if [[ "$TERM_PROGRAM" == "vscode" ]]; then
     PROMPT_COMMAND=""
     unset __vsc_prompt_cmd_original
-fi
-
-# opencode
-if [[ -d "$HOME/.opencode/bin" ]]; then
-    export PATH="$HOME/.opencode/bin:$PATH"
 fi
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!

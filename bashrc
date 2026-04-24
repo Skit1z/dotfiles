@@ -25,9 +25,9 @@ SHELL_CONFIG_DIR="${HOME}/.config/zsh/shell"
 # ================================
 # 加载 shell 配置
 # ================================
+[ -f "$SHELL_CONFIG_DIR/functions.sh" ] && source "$SHELL_CONFIG_DIR/functions.sh"
 [ -f "$SHELL_CONFIG_DIR/export" ] && source "$SHELL_CONFIG_DIR/export"
 [ -f "$SHELL_CONFIG_DIR/alias" ] && source "$SHELL_CONFIG_DIR/alias"
-[ -f "$SHELL_CONFIG_DIR/functions.sh" ] && source "$SHELL_CONFIG_DIR/functions.sh"
 [ -f "$SHELL_CONFIG_DIR/welcome.sh" ] && source "$SHELL_CONFIG_DIR/welcome.sh"
 
 # ================================
