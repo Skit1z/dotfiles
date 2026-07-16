@@ -35,4 +35,5 @@ alias cs='claude --dangerously-skip-permissions'
 alias cdgr='cd "$(git root)"'
 
 # global python
-alias spy='source /Users/skit1z/.venv-global/bin/activate'
+# 全局 Python 虚拟环境
+alias spy='source $HOME/.venv-global/bin/activate'

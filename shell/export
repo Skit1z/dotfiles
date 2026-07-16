@@ -23,18 +23,27 @@ fi
 
 # Homebrew 镜像加速（仅在 Homebrew 存在时设置）
 if command -v brew &>/dev/null; then
-    export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles"
-    export HOMEBREW_API_DOMAIN="https://mirrors.ustc.edu.cn/homebrew-bottles/api"
+    export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.aliyun.com/homebrew/homebrew-bottles"
+    export HOMEBREW_API_DOMAIN="https://mirrors.aliyun.com/homebrew/homebrew-bottles/api"
+    export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.aliyun.com/homebrew/homebrew-core.git"
     export HOMEBREW_NO_AUTO_UPDATE=1
 fi
-
-# 去重，保证 PATH 无重复项
-path_dedup
 
 # Homebrew Python 3 (Intel & Apple Silicon compatible)
 # 使用 Homebrew 安装的 Python 3 作为默认版本
 if [[ -d "${HOMEBREW_PREFIX}/opt/python3/libexec/bin" ]]; then
     export PATH="${HOMEBREW_PREFIX}/opt/python3/libexec/bin:$PATH"
+fi
+
+# Homebrew Ruby
+if [[ -d "${HOMEBREW_PREFIX}/opt/ruby/bin" ]]; then
+    export PATH="${HOMEBREW_PREFIX}/opt/ruby/bin:$PATH"
+    export LDFLAGS="-L${HOMEBREW_PREFIX}/opt/ruby/lib $LDFLAGS"
+    export CPPFLAGS="-I${HOMEBREW_PREFIX}/opt/ruby/include $CPPFLAGS"
+    export PKG_CONFIG_PATH="${HOMEBREW_PREFIX}/opt/ruby/lib/pkgconfig:$PKG_CONFIG_PATH"
+    # Binaries installed by gem (Global & User)
+    export PATH="${HOMEBREW_PREFIX}/lib/ruby/gems/4.0.0/bin:$PATH"
+    export PATH="${HOME}/.local/share/gem/ruby/4.0.0/bin:$PATH"
 fi
 
 # Homebrew GCC (macOS only, override Apple Clang)
@@ -69,12 +78,6 @@ if [[ "$(hostname)" == "Skit1zdeMacBook-Pro.local" ]]; then
     export PATH=$PATH:$ANDROID_HOME/emulator
     export PATH=$PATH:$ANDROID_HOME/platform-tools
 
-    # Homebrew Ruby
-    export PATH="${HOMEBREW_PREFIX}/opt/ruby/bin:$PATH"
-    export LDFLAGS="-L${HOMEBREW_PREFIX}/opt/ruby/lib"
-    export CPPFLAGS="-I${HOMEBREW_PREFIX}/opt/ruby/include"
-
-
     export NEMU_HOME=/Users/skit1z/Workspace/Ysyx/E-stage/ysyx-workbench/nemu
     export AM_HOME=/Users/skit1z/Workspace/Ysyx/E-stage/ysyx-workbench/abstract-machine
 fi
@@ -85,3 +88,11 @@ export NO_PROXY="localhost,127.0.0.1,0.0.0.0,192.168.0.0/16,10.0.0.0/8"
 
 export ENABLE_TOOL_SEARCH=0
 export CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1
+
+# Local overrides for secrets and machine-specific env vars
+# 本地覆盖：密钥和机器特定的环境变量
+[ -f "$HOME/.shell_env_local" ] && source "$HOME/.shell_env_local"
+
+# Deduplicate PATH (must be at the end, after all PATH modifications)
+# 去重 PATH（必须在最后，确保所有路径修改之后执行）
+path_dedup

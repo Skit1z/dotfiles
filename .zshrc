@@ -18,18 +18,11 @@ elif [[ -f "${HOME}/.antidote/antidote.zsh" ]]; then
 fi
 
 # 初始化插件和主题（带兜底）
-# antidote cache path differs by OS
-# antidote 缓存路径按操作系统区分
-if [[ "$(uname -s)" == "Darwin" ]]; then
-    export ZSH="${HOME}/Library/Caches/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
-else
-    export ZSH="${HOME}/.cache/antidote/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
-fi
+# In antidote v2, load() auto-generates and sources the static plugin file.
+# antidote v2 中 load() 自动生成并加载静态插件文件。
 if command -v antidote &>/dev/null; then
-    export ZSH="$(antidote home)/https-COLON--SLASH--SLASH-github.com-SLASH-ohmyzsh-SLASH-ohmyzsh"
-    if ! antidote load; then
-        [ -f "$ZDOTDIR/.zsh_plugins.zsh" ] && source "$ZDOTDIR/.zsh_plugins.zsh"
-    fi
+    export ZSH="$(antidote home)/github.com/ohmyzsh/ohmyzsh"
+    antidote load "$ZDOTDIR/.zsh_plugins.txt" "$ZDOTDIR/.zsh_plugins.zsh"
 elif [[ -f "$ZDOTDIR/.zsh_plugins.zsh" ]]; then
     source "$ZDOTDIR/.zsh_plugins.zsh"
 fi
@@ -71,15 +64,21 @@ export ATUIN_NOBIND=true
 command -v atuin &>/dev/null && eval "$(atuin init zsh --disable-up-arrow)"
 
 # fzf 配置 (Homebrew / apt / git clone)
+# Suppress "can't change option: zle" — macOS 27's zsh makes zle read-only,
+# fzf's eval 'options=(... zle on ...)' can't toggle it (harmless, already on).
+# 抑制 "can't change option: zle" — macOS 27 的 zsh 中 zle 变为只读选项，
+# fzf 的 eval 'options=(... zle on ...)' 无法切换（无害，本身已是 on 状态）。
+_fzf_source() { source "$1" 2> >(grep -v "can't change option: zle" >&2); }
 if [[ -f "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh" ]]; then
-    source "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh"
-    source "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh"
+    _fzf_source "${HOMEBREW_PREFIX}/opt/fzf/shell/key-bindings.zsh"
+    _fzf_source "${HOMEBREW_PREFIX}/opt/fzf/shell/completion.zsh"
 elif [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
-    source /usr/share/doc/fzf/examples/key-bindings.zsh
-    [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && source /usr/share/doc/fzf/examples/completion.zsh
+    _fzf_source /usr/share/doc/fzf/examples/key-bindings.zsh
+    [[ -f /usr/share/doc/fzf/examples/completion.zsh ]] && _fzf_source /usr/share/doc/fzf/examples/completion.zsh
 elif [[ -f "${HOME}/.fzf.zsh" ]]; then
-    source "${HOME}/.fzf.zsh"
+    _fzf_source "${HOME}/.fzf.zsh"
 fi
+unfunction _fzf_source
 
 # 使用 fzf + atuin 搜索历史 (Ctrl+R)
 if command -v atuin &>/dev/null && command -v fzf &>/dev/null; then
@@ -106,3 +105,7 @@ fi
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# bun completions
+# bun 补全
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"

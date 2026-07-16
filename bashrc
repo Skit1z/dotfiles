@@ -83,4 +83,6 @@ fi
 # Rust/Cargo environment (only load when present)
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 
-export AM_HOME=/Users/skit1z/Workspace/Ysyx/E-stage/ysyx-workbench/abstract-machine
+# YSYX project paths (machine-specific, override in ~/.bashrc_local)
+# YSYX 项目路径（机器特定，可在 ~/.bashrc_local 中覆盖）
+export AM_HOME="${AM_HOME:-$HOME/Workspace/Ysyx/E-stage/ysyx-workbench/abstract-machine}"
