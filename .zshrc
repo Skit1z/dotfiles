@@ -64,7 +64,7 @@ if [[ "$TERM_PROGRAM" == "iTerm.app" ]]; then
 fi
 
 # zoxide 初始化
-eval "$(zoxide init zsh)"
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 
 # Atuin - 仅作为历史后端，完全禁用键绑定
 export ATUIN_NOBIND=true

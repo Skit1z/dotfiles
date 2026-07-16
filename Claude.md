@@ -134,6 +134,7 @@ JAVA_HOME='$(/usr/libexec/java_home -v 17'     # 缺少闭合括号，单引号�
 | 操作 | 命令 |
 |------|------|
 | 安装 dotfiles | `bash init.sh` |
+| 安装 dotfiles (轻量) | `bash init.sh --lite` |
 | 重载 zsh 配置 | `exec zsh` |
 | 重载 tmux 配置 | `C-a R`（prefix + Shift+r） |
 | 安装 tmux 插件 | `C-a I`（prefix + Shift+i） |
