@@ -28,7 +28,12 @@ alias mv='mv -i'
 # git related aliases
 alias gag='git exec ag'
 
-
+# aira2
+alias cs='claude --dangerously-skip-permissions'
 # cd to git root directory
 # 跳转到 git 仓库根目录
 alias cdgr='cd "$(git root)"'
+
+# global python
+# 全局 Python 虚拟环境
+alias spy='source $HOME/.venv-global/bin/activate'

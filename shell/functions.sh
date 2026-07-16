@@ -7,6 +7,11 @@ path_append() {
     PATH="${PATH:+"$PATH:"}$1"
 }
 
+path_dedup() {
+    PATH=$(printf '%s' "$PATH" | awk -v RS=: '!seen[$0]++ && length($0)>0 { paths = paths (paths ? ":" : "") $0 } END { print paths }')
+    export PATH
+}
+
 path_prepend() {
     path_remove "$1"
     PATH="$1${PATH:+":$PATH"}"

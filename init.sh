@@ -3,6 +3,12 @@
 # dotfiles 安装脚本 (macOS / Debian)
 # 用途: 将 dotfiles 链接到正确位置并安装必要依赖
 #
+# 用法:
+#   bash init.sh          完整模式（向后兼容）
+#   bash init.sh --lite   轻量模式（Linux 服务器，跳过增强工具/编辑器插件/TPM）
+#   bash init.sh --server 同 --lite
+#   bash init.sh --help   打印帮助信息
+#
 
 set -euo pipefail  # 启用严格模式: 遇错退出、未定义变量报错、管道错误传递
 
@@ -32,8 +38,12 @@ readonly SHELL_CONFIG_DIR="${DOTFILES_DIR}/shell"
 # 操作系统检测结果（由 detect_os 设置）
 OS_TYPE=""
 
-# Homebrew packages (shared across macOS / Linuxbrew)
-# Homebrew 包（macOS / Linuxbrew 共享）
+# Lite mode flag (0=full, 1=lite server install)
+# 轻量模式标志（0=完整, 1=轻量服务器安装）
+LITE_MODE=0
+
+# Homebrew packages (macOS full-mode install; lite mode is Linux-only)
+# Homebrew 包（macOS 完整模式安装；轻量模式仅限 Linux）
 readonly BREW_PACKAGES=(git nvim vim uv atuin eza fzf thefuck tmux zoxide)
 
 # ================================
@@ -58,6 +68,46 @@ log_error() {
 die() {
     log_error "$1"
     exit 1
+}
+
+# ================================
+# 参数解析
+# ================================
+print_help() {
+    echo ""
+    echo "Dotfiles 安装脚本"
+    echo ""
+    echo "用法:"
+    echo "  bash init.sh              完整模式（macOS / Debian 工作站）"
+    echo "  bash init.sh --lite        轻量模式（Linux 服务器，无人值守）"
+    echo "  bash init.sh --server      同 --lite"
+    echo "  bash init.sh --help        打印此帮助信息"
+    echo ""
+    echo "轻量模式跳过项:"
+    echo "  - 增强工具 (atuin / eza / thefuck / zoxide)"
+    echo "  - Linuxbrew / Homebrew"
+    echo "  - vim-plug 及插件安装"
+    echo "  - tmux TPM 插件管理器"
+    echo "  - 所有交互式提问（无人值守运行）"
+    echo "  - 仅支持 Linux；macOS 上使用 --lite 会退出"
+    echo ""
+}
+
+parse_args() {
+    for arg in "$@"; do
+        case "${arg}" in
+            --lite|--server)
+                LITE_MODE=1
+                ;;
+            --help|-h)
+                print_help
+                exit 0
+                ;;
+            *)
+                die "未知参数: ${arg}（使用 --help 查看用法）"
+                ;;
+        esac
+    done
 }
 
 # ================================
@@ -179,6 +229,10 @@ install_dependencies_debian() {
         sudo apt-get install -y "${apt_install[@]}" || log_warn "部分包安装失败"
     fi
 
+    # 增强工具（仅完整模式安装）
+    # Enhanced tools (full mode only)
+    if [[ "${LITE_MODE}" -eq 0 ]]; then
+
     # zoxide — 可能不在旧版 apt 中，尝试安装或用 cargo/curl
     if ! command -v zoxide &>/dev/null; then
         if apt-cache show zoxide &>/dev/null 2>&1; then
@@ -217,6 +271,10 @@ install_dependencies_debian() {
         else
             log_warn "thefuck 需要 pip3，请先安装 python3-pip"
         fi
+    fi
+
+    else
+        log_info "轻量模式: 跳过增强工具 (atuin / eza / thefuck / zoxide)"
     fi
 
     # antidote — git clone 安装
@@ -331,17 +389,21 @@ setup_zsh_config() {
     # 设置 ZDOTDIR 环境变量 (在 ~/.zshenv 中)
     setup_zdotdir
 
-    # Debian: 提示设置 zsh 为默认 shell
+    # Debian: 提示设置 zsh 为默认 shell（轻量模式跳过交互）
     if [[ "${OS_TYPE}" == "debian" ]]; then
         local current_shell
         current_shell="$(getent passwd "${USER}" | cut -d: -f7)"
         if [[ "${current_shell}" != *"zsh"* ]]; then
-            echo ""
-            read -rp "是否将 zsh 设为默认 shell? (y/n): " set_zsh
-            if [[ "${set_zsh}" =~ ^[Yy]$ ]]; then
-                chsh -s "$(command -v zsh)" \
-                    && log_success "默认 shell 已设为 zsh" \
-                    || log_warn "设置默认 shell 失败，请手动运行: chsh -s $(command -v zsh)"
+            if [[ "${LITE_MODE}" -eq 1 ]]; then
+                log_info "轻量模式: 跳过 chsh，可手动运行 chsh -s $(command -v zsh) 切换默认 shell"
+            else
+                echo ""
+                read -rp "是否将 zsh 设为默认 shell? (y/n): " set_zsh
+                if [[ "${set_zsh}" =~ ^[Yy]$ ]]; then
+                    chsh -s "$(command -v zsh)" \
+                        && log_success "默认 shell 已设为 zsh" \
+                        || log_warn "设置默认 shell 失败，请手动运行: chsh -s $(command -v zsh)"
+                fi
             fi
         fi
     fi
@@ -378,6 +440,13 @@ setup_vim_config() {
         create_symlink "${VIMRC_SOURCE}" "${nvim_config_dir}/init.vim"
     else
         log_warn ".vimrc 文件不存在，跳过 vim 配置"
+    fi
+
+    # vim-plug 和插件安装（仅完整模式）
+    # vim-plug and plugin install (full mode only)
+    if [[ "${LITE_MODE}" -eq 1 ]]; then
+        log_info "轻量模式: 跳过 vim-plug 和插件安装（vim 保持裸配置）"
+        return 0
     fi
 
     # Install vim-plug for Vim
@@ -430,8 +499,12 @@ setup_tmux_config() {
     local tmux_dir="${DOTFILES_DIR}/tmux"
     if [[ -d "${tmux_dir}" ]]; then
         create_symlink "${tmux_dir}" "${HOME}/.tmux"
-        # 初始化子模块（确保 tpm 已拉取）
-        (cd "${DOTFILES_DIR}" && git submodule update --init --recursive) || log_warn "子模块初始化失败"
+        # 初始化子模块（确保 tpm 已拉取）—— 轻量模式跳过
+        if [[ "${LITE_MODE}" -eq 1 ]]; then
+            log_info "轻量模式: 跳过 TPM 子模块初始化"
+        else
+            (cd "${DOTFILES_DIR}" && git submodule update --init --recursive) || log_warn "子模块初始化失败"
+        fi
     fi
 }
 
@@ -454,21 +527,25 @@ setup_git_config() {
     git_email=$(git config --global user.email 2>/dev/null || echo "")
 
     if [[ -z "${git_name}" || -z "${git_email}" ]]; then
-        log_warn "Git 用户信息未配置"
-        echo ""
-        read -rp "是否现在配置 Git 用户信息? (y/n): " do_config
-        if [[ "${do_config}" =~ ^[Yy]$ ]]; then
-            if [[ -z "${git_name}" ]]; then
-                read -rp "请输入你的 Git 用户名: " git_name
-                git config --global user.name "${git_name}" || die "设置 Git 用户名失败"
-            fi
-            if [[ -z "${git_email}" ]]; then
-                read -rp "请输入你的 Git 邮箱: " git_email
-                git config --global user.email "${git_email}" || die "设置 Git 邮箱失败"
-            fi
-            log_success "Git 用户信息配置完成"
+        if [[ "${LITE_MODE}" -eq 1 ]]; then
+            log_info "轻量模式: Git 用户信息未配置，请手动 git config --global user.name / user.email"
         else
-            log_info "跳过 Git 用户信息配置"
+            log_warn "Git 用户信息未配置"
+            echo ""
+            read -rp "是否现在配置 Git 用户信息? (y/n): " do_config
+            if [[ "${do_config}" =~ ^[Yy]$ ]]; then
+                if [[ -z "${git_name}" ]]; then
+                    read -rp "请输入你的 Git 用户名: " git_name
+                    git config --global user.name "${git_name}" || die "设置 Git 用户名失败"
+                fi
+                if [[ -z "${git_email}" ]]; then
+                    read -rp "请输入你的 Git 邮箱: " git_email
+                    git config --global user.email "${git_email}" || die "设置 Git 邮箱失败"
+                fi
+                log_success "Git 用户信息配置完成"
+            else
+                log_info "跳过 Git 用户信息配置"
+            fi
         fi
     else
         log_info "Git 用户: ${git_name} <${git_email}>"
@@ -540,9 +617,25 @@ check_atuin_auth() {
 # 主函数
 # ================================
 main() {
+    # 解析命令行参数
+    parse_args "$@"
+
+    # 轻量模式仅支持 Linux
+    if [[ "${LITE_MODE}" -eq 1 && "$(uname -s)" == "Darwin" ]]; then
+        die "轻量模式仅支持 Linux 服务器（macOS 请使用完整模式: bash init.sh）"
+    fi
+
+    local mode_label
+    if [[ "${LITE_MODE}" -eq 1 ]]; then
+        mode_label="轻量 (Linux server)"
+    else
+        mode_label="完整"
+    fi
+
     echo ""
     echo "======================================="
     echo "   Dotfiles 安装脚本 (macOS / Debian)"
+    echo "   模式: ${mode_label}"
     echo "======================================="
     echo ""
 
